@@ -12,6 +12,11 @@ import pickle
 import numpy as np
 import pandas as pd
 
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+ROOT_DIR = os.path.abspath(os.path.join(BASE_DIR, os.pardir))
+DATA_DIR = os.path.join(ROOT_DIR, 'data')
+MODELS_DIR = os.path.join(ROOT_DIR, 'models')
+
 # Lazy imports for optional DL deps
 _keras = None
 
@@ -41,17 +46,21 @@ def load_all_models():
     # Kept as None; predict_heart() handles training inline like original app.py
 
     # Diabetes ANN
-    if os.path.exists("diabetes_ann_model.h5"):
-        _registry["diabetes"]["model"] = keras.models.load_model("diabetes_ann_model.h5")
-    if os.path.exists("diabetes_scaler.pkl"):
-        with open("diabetes_scaler.pkl", "rb") as f:
+    diabetes_model_path = os.path.join(MODELS_DIR, "diabetes_ann_model.h5")
+    diabetes_scaler_path = os.path.join(MODELS_DIR, "diabetes_scaler.pkl")
+    if os.path.exists(diabetes_model_path):
+        _registry["diabetes"]["model"] = keras.models.load_model(diabetes_model_path)
+    if os.path.exists(diabetes_scaler_path):
+        with open(diabetes_scaler_path, "rb") as f:
             _registry["diabetes"]["scaler"] = pickle.load(f)
 
     # Parkinson ANN
-    if os.path.exists("parkinson_ann_model.h5"):
-        _registry["parkinson"]["model"] = keras.models.load_model("parkinson_ann_model.h5")
-    if os.path.exists("parkinson_scaler.pkl"):
-        with open("parkinson_scaler.pkl", "rb") as f:
+    parkinson_model_path = os.path.join(MODELS_DIR, "parkinson_ann_model.h5")
+    parkinson_scaler_path = os.path.join(MODELS_DIR, "parkinson_scaler.pkl")
+    if os.path.exists(parkinson_model_path):
+        _registry["parkinson"]["model"] = keras.models.load_model(parkinson_model_path)
+    if os.path.exists(parkinson_scaler_path):
+        with open(parkinson_scaler_path, "rb") as f:
             _registry["parkinson"]["scaler"] = pickle.load(f)
 
     return _registry
@@ -66,10 +75,11 @@ def predict_heart(features: dict) -> tuple[int, float]:
     """
     from sklearn.ensemble import RandomForestClassifier
 
-    if not os.path.exists("heart.csv"):
+    heart_csv = os.path.join(DATA_DIR, "heart.csv")
+    if not os.path.exists(heart_csv):
         raise FileNotFoundError("heart.csv not found")
 
-    data = pd.read_csv("heart.csv")
+    data = pd.read_csv(heart_csv)
     X = data.drop("target", axis=1)
     y = data["target"]
 
