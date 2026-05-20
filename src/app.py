@@ -40,8 +40,10 @@ DATA_DIR = os.path.join(ROOT_DIR, 'data')
 MODELS_DIR = os.path.join(ROOT_DIR, 'models')
 INSTANCE_DIR = os.path.join(ROOT_DIR, 'instance')
 INSTANCE_DB_PATH = os.path.join(INSTANCE_DIR, 'submissions.db')
+TEMPLATE_DIR = os.path.join(ROOT_DIR, 'templates')
+STATIC_DIR = os.path.join(ROOT_DIR, 'static')
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
 app.secret_key = 'smvhskcj7679e8287efuiwu'
 
 SYMPTOMS_HEART     = get_symptom_list("heart")
