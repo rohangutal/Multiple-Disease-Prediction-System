@@ -1,0 +1,72 @@
+[
+  {
+    "timestamp": "2026-03-29T06:09:55.496377Z",
+    "user": "What is HbA1c?",
+    "bot": "HbA1c measures average blood glucose over 2-3 months; normal is below 5.7%. Higher values indicate prediabetes or diabetes risk. (Disclaimer: For medical advice, consult a qualified healthcare professional.)"
+  },
+  {
+    "timestamp": "2026-03-29T06:10:18.765240Z",
+    "user": "Normal blood glucose?",
+    "bot": "Normal blood pressure is around 120/80 mmHg. Values above 130/80 are considered elevated, and you should monitor them with a doctor. (Disclaimer: For medical advice, consult a qualified healthcare professional.)"
+  },
+  {
+    "timestamp": "2026-03-29T06:10:24.831632Z",
+    "user": "Tell me about BMI",
+    "bot": "BMI is body mass index, a ratio of weight to height. 18.5-24.9 is normal, 25-29.9 is overweight, and 30+ is obese. (Disclaimer: For medical advice, consult a qualified healthcare professional.)"
+  },
+  {
+    "timestamp": "2026-03-29T06:10:38.782611Z",
+    "user": "Normal cholesterol level?",
+    "bot": "Normal blood pressure is around 120/80 mmHg. Values above 130/80 are considered elevated, and you should monitor them with a doctor. (Disclaimer: For medical advice, consult a qualified healthcare professional.)"
+  },
+  {
+    "timestamp": "2026-03-29T06:14:11.296595Z",
+    "user": "Signs of heart disease",
+    "bot": "Prevent heart disease with regular exercise, healthy diet, not smoking, maintaining healthy weight, and managing blood pressure, cholesterol, and diabetes. (Disclaimer: For medical advice, consult a qualified healthcare professional.)"
+  },
+  {
+    "timestamp": "2026-03-29T06:14:20.107985Z",
+    "user": "Tell me about Diabetes",
+    "bot": "Diabetes risk factors include high BMI, family history, poor diet, physical inactivity, high blood pressure, and high cholesterol. (Disclaimer: For medical advice, consult a qualified healthcare professional.)"
+  },
+  {
+    "timestamp": "2026-03-29T06:14:41.400093Z",
+    "user": "Healthy BMI range?",
+    "bot": "BMI is body mass index, a ratio of weight to height. 18.5-24.9 is normal, 25-29.9 is overweight, and 30+ is obese. (Disclaimer: For medical advice, consult a qualified healthcare professional.)"
+  },
+  {
+    "timestamp": "2026-04-02T15:43:18.137326Z",
+    "user": "What is HbA1c?",
+    "bot": "HbA1c measures average blood glucose over 2-3 months; normal is below 5.7%. Higher values indicate prediabetes or diabetes risk. (Disclaimer: For medical advice, consult a qualified healthcare professional.)"
+  },
+  {
+    "timestamp": "2026-04-02T15:47:27.118069Z",
+    "user": "What is a healthy BMI?",
+    "bot": "BMI is body mass index, a ratio of weight to height. 18.5-24.9 is normal, 25-29.9 is overweight, and 30+ is obese. (Disclaimer: For medical advice, consult a qualified healthcare professional.)"
+  },
+  {
+    "timestamp": "2026-04-02T15:47:31.616004Z",
+    "user": "Tell me about Heart Disease",
+    "bot": "Prevent heart disease with regular exercise, healthy diet, not smoking, maintaining healthy weight, and managing blood pressure, cholesterol, and diabetes. (Disclaimer: For medical advice, consult a qualified healthcare professional.)"
+  },
+  {
+    "timestamp": "2026-04-02T15:52:21.029495Z",
+    "user": "fasting blood sugar",
+    "bot": "If your blood sugar is high, stay hydrated, do light exercise, and follow your doctor\u2019s guidance. Avoid sugary foods and monitor levels closely. (Disclaimer: For medical advice, consult a qualified healthcare professional.)"
+  },
+  {
+    "timestamp": "2026-04-04T18:32:13.474003Z",
+    "user": "What is HbA1c?",
+    "bot": "HbA1c measures average blood glucose over 2-3 months; normal is below 5.7%. Higher values indicate prediabetes or diabetes risk. (Disclaimer: For medical advice, consult a qualified healthcare professional.)"
+  },
+  {
+    "timestamp": "2026-04-04T18:32:20.840636Z",
+    "user": "Tell me about Diabetes",
+    "bot": "Diabetes risk factors include high BMI, family history, poor diet, physical inactivity, high blood pressure, and high cholesterol. (Disclaimer: For medical advice, consult a qualified healthcare professional.)"
+  },
+  {
+    "timestamp": "2026-05-17T16:28:03.789356Z",
+    "user": "What is HbA1c?",
+    "bot": "HbA1c measures average blood glucose over 2-3 months; normal is below 5.7%. Higher values indicate prediabetes or diabetes risk. (Disclaimer: For medical advice, consult a qualified healthcare professional.)"
+  }
+]

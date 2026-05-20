@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Saved Records — HealthCure</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+      :root {
+        --primary: #2E86DE;
+        --primary-dark: #1a6bbf;
+        --primary-light: #e8f2fd;
+        --secondary: #48C9B0;
+        --bg: #F4F6F7;
+        --surface: #ffffff;
+        --surface2: #f8fafc;
+        --border: #e2e8f0;
+        --text: #1a2332;
+        --text-muted: #64748b;
+        --text-dim: #94a3b8;
+        --positive: #15803d;
+        --positive-bg: #dcfce7;
+        --negative: #dc2626;
+        --negative-bg: #fee2e2;
+        --heart-bg: #fff0f0;
+        --heart-color: #dc2626;
+        --diabetes-bg: #fef9c3;
+        --diabetes-color: #a16207;
+        --parkinson-bg: #ede9fe;
+        --parkinson-color: #7c3aed;
+        --shadow-sm: 0 1px 3px rgba(0,0,0,0.07);
+        --shadow: 0 4px 16px rgba(0,0,0,0.08);
+        --radius: 14px;
+        --radius-sm: 9px;
+      }
+
+      *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+      body {
+        font-family: 'Poppins', sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+      }
+
+      /* ── TOPBAR ── */
+      .topbar {
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        padding: 0 32px;
+        display: flex; align-items: center; justify-content: space-between;
+        height: 64px;
+        position: sticky; top: 0; z-index: 100;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .topbar-brand { display: flex; align-items: center; gap: 11px; }
+      .topbar-logo {
+        width: 38px; height: 38px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        border-radius: 11px;
+        display: flex; align-items: center; justify-content: center;
+        color: #fff; font-size: 0.95rem;
+        box-shadow: 0 3px 10px rgba(46,134,222,0.28);
+      }
+      .topbar-brand-text .name { font-size: 1rem; font-weight: 700; color: var(--primary); line-height: 1.1; }
+      .topbar-brand-text .sub { font-size: 0.65rem; color: var(--text-muted); font-weight: 400; }
+      .topbar-nav { display: flex; align-items: center; gap: 8px; }
+
+      .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: var(--radius-sm); font-family: 'Poppins', sans-serif; font-size: 0.8rem; font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.2s; border: none; line-height: 1; }
+      .btn-ghost { background: transparent; color: var(--text-muted); border: 1.5px solid var(--border); }
+      .btn-ghost:hover { background: var(--primary-light); color: var(--primary); border-color: var(--primary); text-decoration: none; }
+      .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; box-shadow: 0 3px 12px rgba(46,134,222,0.3); }
+      .btn-primary:hover { opacity: 0.92; transform: translateY(-1px); box-shadow: 0 5px 16px rgba(46,134,222,0.38); text-decoration: none; color: #fff; }
+      .btn-danger-outline { background: transparent; color: var(--negative); border: 1.5px solid rgba(220,38,38,0.25); }
+      .btn-danger-outline:hover { background: var(--negative-bg); border-color: var(--negative); }
+      .btn-sm { padding: 5px 11px; font-size: 0.72rem; border-radius: 7px; }
+      .btn-accent-outline { background: transparent; color: var(--primary); border: 1.5px solid rgba(46,134,222,0.3); }
+      .btn-accent-outline:hover { background: var(--primary-light); border-color: var(--primary); }
+      .btn-logout { background: transparent; color: var(--text-muted); border: 1.5px solid var(--border); }
+      .btn-logout:hover { background: var(--bg); color: var(--text); border-color: var(--text-dim); text-decoration: none; }
+
+      /* ── PAGE ── */
+      .page { max-width: 1200px; margin: 0 auto; padding: 32px 24px 60px; }
+
+      .page-header { margin-bottom: 26px; animation: fadeDown 0.4s ease both; }
+      @keyframes fadeDown { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+      .page-header h2 { font-size: 1.6rem; color: var(--text); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; }
+      .page-header p { font-size: 0.82rem; color: var(--text-muted); font-weight: 400; }
+
+      /* ── FILTER BAR ── */
+      .filter-bar {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px 20px;
+        display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+        margin-bottom: 20px;
+        box-shadow: var(--shadow-sm);
+        animation: fadeUp 0.4s 0.1s ease both;
+      }
+      @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+      .filter-label { font-size: 0.72rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.07em; white-space: nowrap; }
+
+      .filter-select {
+        padding: 9px 34px 9px 12px;
+        background: var(--surface2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center;
+        border: 1.5px solid var(--border);
+        border-radius: var(--radius-sm);
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.82rem; color: var(--text);
+        outline: none; cursor: pointer; -webkit-appearance: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        min-width: 150px;
+      }
+      .filter-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(46,134,222,0.1); }
+
+      .search-wrap { position: relative; flex: 1; min-width: 180px; }
+      .search-wrap i { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--text-dim); font-size: 0.82rem; pointer-events: none; }
+      .search-input {
+        width: 100%; padding: 9px 14px 9px 32px;
+        background: var(--surface2); border: 1.5px solid var(--border);
+        border-radius: var(--radius-sm);
+        font-family: 'Poppins', sans-serif; font-size: 0.82rem; color: var(--text);
+        outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+      }
+      .search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(46,134,222,0.1); background: var(--surface); }
+      .search-input::placeholder { color: var(--text-dim); }
+
+      .row-count { margin-left: auto; font-size: 0.72rem; color: var(--text-muted); background: var(--surface2); border: 1px solid var(--border); padding: 4px 12px; border-radius: 20px; white-space: nowrap; }
+
+      /* ── STATS CHIPS ── */
+      .stats-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; animation: fadeUp 0.4s 0.15s ease both; }
+      .stat-chip { display: flex; align-items: center; gap: 8px; padding: 9px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 40px; font-size: 0.8rem; color: var(--text-muted); box-shadow: var(--shadow-sm); }
+      .stat-chip strong { color: var(--text); font-weight: 700; }
+      .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+      .dot-blue { background: var(--primary); }
+      .dot-green { background: #22c55e; }
+      .dot-red { background: var(--negative); }
+
+      /* ── TABLE ── */
+      .table-card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow); animation: fadeUp 0.4s 0.2s ease both; }
+      .table-scroll { overflow-x: auto; }
+
+      table { width: 100%; border-collapse: collapse; }
+      thead { background: var(--surface2); }
+      thead th { padding: 14px 16px; font-size: 0.68rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; text-align: left; white-space: nowrap; border-bottom: 1px solid var(--border); }
+      tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+      tbody tr:last-child { border-bottom: none; }
+      tbody tr:hover { background: var(--primary-light); }
+      td { padding: 18px 16px; font-size: 0.8rem; color: var(--text); vertical-align: middle; }
+      td.id-cell { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; }
+      td.ts-cell { font-size: 0.72rem; color: var(--text-muted); white-space: nowrap; }
+      td.name-cell { font-weight: 600; white-space: nowrap; }
+      td.email-cell { font-size: 0.76rem; color: var(--text-muted); }
+      td.phone-cell { font-size: 0.76rem; }
+
+      .disease-badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; white-space: nowrap; }
+      .disease-Heart     { background: var(--heart-bg); color: var(--heart-color); }
+      .disease-Diabetes  { background: var(--diabetes-bg); color: var(--diabetes-color); }
+      .disease-Parkinson { background: var(--parkinson-bg); color: var(--parkinson-color); }
+      .disease-default   { background: var(--surface2); color: var(--text-muted); }
+
+      .result-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; white-space: nowrap; }
+      .result-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+      .result-positive { background: var(--positive-bg); color: var(--positive); }
+      .result-negative { background: var(--negative-bg); color: var(--negative); }
+      .result-other { background: var(--surface2); color: var(--text-muted); }
+
+      .action-cell { white-space: nowrap; display: flex; gap: 6px; align-items: center; }
+
+      /* ── EMPTY STATE ── */
+      .empty-state { padding: 60px 20px; text-align: center; }
+      .empty-icon { font-size: 2.5rem; margin-bottom: 14px; opacity: 0.35; }
+      .empty-state h3 { font-size: 1.1rem; color: var(--text); margin-bottom: 6px; font-weight: 600; }
+      .empty-state p { color: var(--text-muted); font-size: 0.82rem; }
+
+      /* d-inline fix */
+      .d-inline { display: inline; }
+    </style>
+  </head>
+  <body>
+
+    <!-- TOPBAR -->
+    <nav class="topbar">
+      <div class="topbar-brand">
+        <div class="topbar-logo"><i class="fas fa-heartbeat"></i></div>
+        <div class="topbar-brand-text">
+          <div class="name">HealthCure</div>
+          <div class="sub">Admin Portal</div>
+        </div>
+      </div>
+      <div class="topbar-nav">
+        <a class="btn btn-ghost" href="/"><i class="fas fa-home"></i> Home</a>
+        <a class="btn btn-primary" href="/records"><i class="fas fa-database"></i> All Records</a>
+        {% if session.admin_logged_in %}
+          <a class="btn btn-logout" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        {% endif %}
+      </div>
+    </nav>
+
+    <!-- PAGE -->
+    <div class="page">
+      <div class="page-header">
+        <h2><i class="fas fa-folder-open" style="color:var(--primary);margin-right:10px;font-size:1.3rem;"></i>Saved Submissions</h2>
+        <p>Browse, filter, and manage all patient prediction records</p>
+      </div>
+
+      <!-- FILTER BAR -->
+      <div class="filter-bar">
+        <span class="filter-label">Filter</span>
+        <form method="get" action="/records" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;flex:1;">
+          <select name="disease" class="filter-select" onchange="this.form.submit()">
+            <option value="" {% if not disease %}selected{% endif %}>All Diseases</option>
+            <option value="Heart"     {% if disease == 'Heart'     %}selected{% endif %}>❤️ Heart</option>
+            <option value="Diabetes"  {% if disease == 'Diabetes'  %}selected{% endif %}>🩸 Diabetes</option>
+            <option value="Parkinson" {% if disease == 'Parkinson' %}selected{% endif %}>🧠 Parkinson</option>
+          </select>
+          <div class="search-wrap">
+            <i class="fas fa-search"></i>
+            <input type="text" class="search-input" placeholder="Search records…" id="searchInput" oninput="filterTable()">
+          </div>
+        </form>
+        <span class="row-count" id="rowCount">— records</span>
+      </div>
+
+      {% if submissions and submissions|length > 0 %}
+      <!-- STATS -->
+      <div class="stats-row" id="statsRow">
+        <div class="stat-chip"><span class="dot dot-blue"></span>Total <strong id="totalCount">{{ submissions|length }}</strong></div>
+        <div class="stat-chip"><span class="dot dot-green"></span>Low Risk <strong id="negCount">—</strong></div>
+        <div class="stat-chip"><span class="dot dot-red"></span>High Risk <strong id="posCount">—</strong></div>
+      </div>
+
+      <!-- TABLE -->
+      <div class="table-card">
+        <div class="table-scroll">
+          <table id="recordsTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Timestamp</th>
+                <th>Disease</th>
+                <th>Patient Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Result</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for s in submissions %}
+              <tr data-result="{{ s.result | lower }}">
+                <td class="id-cell">#{{ s.id }}</td>
+                <td class="ts-cell">{{ s.timestamp.strftime('%Y-%m-%d %H:%M') if s.timestamp else '—' }}</td>
+                <td>
+                  <span class="disease-badge disease-{{ s.disease or 'default' }}">{{ s.disease or '—' }}</span>
+                </td>
+                <td class="name-cell">{{ s.firstname }} {{ s.lastname }}</td>
+                <td class="email-cell">{{ s.email or '—' }}</td>
+                <td class="phone-cell">{{ s.phone_no or '—' }}</td>
+                <td>
+                  {% set r = (s.result or '') | lower %}
+                  {% if 'positive' in r or 'high' in r or 'yes' in r %}
+                    <span class="result-badge result-positive">{{ s.result }}</span>
+                  {% elif 'negative' in r or 'low' in r or 'no' in r %}
+                    <span class="result-badge result-negative">{{ s.result }}</span>
+                  {% else %}
+                    <span class="result-badge result-other">{{ s.result or '—' }}</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <div class="action-cell">
+                    <a class="btn btn-sm btn-accent-outline" href="{{ url_for('edit_record', record_id=s.id) }}">
+                      <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <form method="post" action="{{ url_for('delete_record', record_id=s.id) }}" class="d-inline" onsubmit="return confirm('Delete record #{{ s.id }}?');" style="display:inline;">
+                      <button type="submit" class="btn btn-sm btn-danger-outline">
+                        <i class="fas fa-trash"></i> Delete
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {% else %}
+      <div class="table-card">
+        <div class="empty-state">
+          <div class="empty-icon">📋</div>
+          <h3>No Records Found</h3>
+          <p>No submissions match the selected filter. Try a different disease or view all records.</p>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <script>
+      function filterTable() {
+        const q = document.getElementById('searchInput').value.toLowerCase();
+        const rows = document.querySelectorAll('#recordsTable tbody tr');
+        let visible = 0;
+        rows.forEach(row => {
+          const match = row.textContent.toLowerCase().includes(q);
+          row.style.display = match ? '' : 'none';
+          if (match) visible++;
+        });
+        document.getElementById('rowCount').textContent = visible + ' records';
+      }
+
+      window.addEventListener('DOMContentLoaded', () => {
+        const rows = document.querySelectorAll('#recordsTable tbody tr');
+        let pos = 0, neg = 0;
+        rows.forEach(r => {
+          const result = (r.dataset.result || '');
+          if (result.includes('positive') || result.includes('high') || result.includes('yes')) pos++;
+          else if (result.includes('negative') || result.includes('low') || result.includes('no')) neg++;
+        });
+        const pc = document.getElementById('posCount');
+        const nc = document.getElementById('negCount');
+        const rc = document.getElementById('rowCount');
+        if (pc) pc.textContent = pos;
+        if (nc) nc.textContent = neg;
+        if (rc) rc.textContent = rows.length + ' records';
+      });
+
+      document.querySelectorAll('#recordsTable tbody tr').forEach((row, i) => {
+        row.style.opacity = '0';
+        row.style.transform = 'translateY(8px)';
+        row.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        setTimeout(() => {
+          row.style.opacity = '1';
+          row.style.transform = 'translateY(0)';
+        }, 200 + i * 30);
+      });
+    </script>
+  </body>
+</html>

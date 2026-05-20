@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Edit Record — HealthCure</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+      :root {
+        --primary: #2E86DE;
+        --primary-dark: #1a6bbf;
+        --primary-light: #e8f2fd;
+        --bg: #F4F6F7;
+        --surface: #ffffff;
+        --surface2: #f8fafc;
+        --border: #e2e8f0;
+        --text: #1a2332;
+        --text-muted: #64748b;
+        --text-dim: #94a3b8;
+        --success: #15803d;
+        --success-bg: #dcfce7;
+        --danger: #dc2626;
+        --danger-bg: #fee2e2;
+        --shadow-sm: 0 1px 3px rgba(0,0,0,0.07);
+        --shadow: 0 4px 16px rgba(0,0,0,0.08);
+        --radius: 14px;
+        --radius-sm: 9px;
+      }
+      *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+      /* TOPBAR */
+      .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 32px; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-sm); }
+      .topbar-brand { display: flex; align-items: center; gap: 11px; }
+      .topbar-logo { width: 38px; height: 38px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-radius: 11px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.95rem; }
+      .topbar-brand-name { font-size: 1rem; font-weight: 700; color: var(--primary); }
+
+      .breadcrumb { display: flex; align-items: center; gap: 7px; font-size: 0.78rem; color: var(--text-muted); }
+      .breadcrumb a { color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+      .breadcrumb a:hover { color: var(--primary); }
+      .breadcrumb .sep { color: var(--text-dim); }
+      .breadcrumb .current { color: var(--text); font-weight: 500; }
+
+      /* PAGE */
+      .page { max-width: 860px; margin: 0 auto; padding: 32px 24px 60px; }
+
+      .page-header { margin-bottom: 26px; display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 14px; animation: fadeDown 0.4s ease both; }
+      @keyframes fadeDown { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+      .page-header-left h2 { font-size: 1.5rem; color: var(--text); font-weight: 700; letter-spacing: -0.02em; }
+      .page-header-left p { font-size: 0.78rem; color: var(--text-muted); margin-top: 3px; }
+      .record-id-tag { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: var(--primary-light); border: 1px solid rgba(46,134,222,0.2); border-radius: 30px; font-size: 0.78rem; font-weight: 600; color: var(--primary); }
+
+      /* FORM CARD */
+      .form-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px 36px; box-shadow: var(--shadow); animation: fadeUp 0.4s 0.1s ease both; position: relative; overflow: hidden; }
+      @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+      .form-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--primary), var(--primary-dark), #48C9B0); }
+
+      .section-label { font-size: 0.65rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.09em; margin-bottom: 16px; margin-top: 28px; display: flex; align-items: center; gap: 8px; }
+      .section-label:first-of-type { margin-top: 0; }
+      .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+      .section-label i { color: var(--primary); }
+
+      .form-grid { display: grid; gap: 18px; }
+      .cols-3 { grid-template-columns: repeat(3, 1fr); }
+      .cols-4 { grid-template-columns: repeat(4, 1fr); }
+      .cols-2 { grid-template-columns: repeat(2, 1fr); }
+      @media (max-width: 680px) { .cols-3, .cols-4, .cols-2 { grid-template-columns: 1fr; } }
+      @media (max-width: 860px) { .cols-4 { grid-template-columns: repeat(2,1fr); } }
+
+      .field { display: flex; flex-direction: column; gap: 6px; }
+      .field-label { font-size: 0.69rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.07em; transition: color 0.2s; }
+      .field-input, .field-textarea {
+        padding: 11px 13px;
+        background: var(--surface2);
+        border: 1.5px solid var(--border);
+        border-radius: var(--radius-sm);
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.84rem; color: var(--text);
+        outline: none;
+        transition: border-color 0.22s, box-shadow 0.22s, background 0.22s;
+        -webkit-appearance: none;
+      }
+      .field-input:focus, .field-textarea:focus { border-color: var(--primary); background: var(--surface); box-shadow: 0 0 0 3px rgba(46,134,222,0.1); }
+      .field-input::placeholder, .field-textarea::placeholder { color: var(--text-dim); }
+      .field-textarea { font-family: 'Courier New', monospace; font-size: 0.78rem; resize: vertical; min-height: 180px; line-height: 1.65; }
+      .field-hint { font-size: 0.7rem; color: var(--text-dim); }
+
+      .json-status { display: inline-flex; align-items: center; gap: 5px; font-size: 0.7rem; padding: 3px 10px; border-radius: 20px; font-weight: 500; transition: all 0.2s; }
+      .json-ok     { background: var(--success-bg); color: var(--success); }
+      .json-error  { background: var(--danger-bg); color: var(--danger); }
+      .json-neutral{ background: var(--surface2); color: var(--text-muted); border: 1px solid var(--border); }
+
+      /* FOOTER ACTIONS */
+      .form-footer { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+
+      .btn-save { display: inline-flex; align-items: center; gap: 8px; padding: 12px 26px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; font-family: 'Poppins', sans-serif; font-size: 0.88rem; font-weight: 600; border: none; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 16px rgba(46,134,222,0.35); transition: all 0.2s; }
+      .btn-save:hover { transform: translateY(-1.5px); box-shadow: 0 6px 22px rgba(46,134,222,0.45); }
+      .btn-back { display: inline-flex; align-items: center; gap: 7px; padding: 11px 20px; background: transparent; color: var(--text-muted); font-family: 'Poppins', sans-serif; font-size: 0.82rem; font-weight: 400; border: 1.5px solid var(--border); border-radius: 50px; text-decoration: none; cursor: pointer; transition: all 0.2s; }
+      .btn-back:hover { background: var(--surface2); color: var(--text); border-color: var(--text-dim); text-decoration: none; }
+
+      .unsaved-dot { display: none; width: 8px; height: 8px; border-radius: 50%; background: var(--primary); margin-left: 4px; animation: dotPulse 1.5s infinite; }
+      .unsaved-dot.visible { display: inline-block; }
+      @keyframes dotPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+    </style>
+  </head>
+  <body>
+
+    <nav class="topbar">
+      <div class="topbar-brand">
+        <div class="topbar-logo"><i class="fas fa-heartbeat"></i></div>
+        <div class="topbar-brand-name">HealthCure</div>
+      </div>
+      <nav class="breadcrumb">
+        <a href="/">Home</a>
+        <span class="sep"><i class="fas fa-chevron-right" style="font-size:0.6rem;"></i></span>
+        <a href="{{ url_for('records') }}">Records</a>
+        <span class="sep"><i class="fas fa-chevron-right" style="font-size:0.6rem;"></i></span>
+        <span class="current">Edit #{{ record.id }}</span>
+      </nav>
+    </nav>
+
+    <div class="page">
+      <div class="page-header">
+        <div class="page-header-left">
+          <h2>Edit Submission</h2>
+          <p>Update patient details and prediction inputs for this record</p>
+        </div>
+        <div class="record-id-tag">
+          <i class="fas fa-file-medical" style="font-size:0.75rem;"></i>
+          Record #{{ record.id }}
+          <span class="unsaved-dot" id="unsavedDot" title="Unsaved changes"></span>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <form method="post" action="{{ url_for('edit_record', record_id=record.id) }}" id="editForm">
+
+          <p class="section-label"><i class="fas fa-user"></i> Personal Information</p>
+          <div class="form-grid cols-3">
+            <div class="field">
+              <label class="field-label">First Name</label>
+              <input class="field-input" name="firstname" value="{{ record.firstname or '' }}" placeholder="First name">
+            </div>
+            <div class="field">
+              <label class="field-label">Last Name</label>
+              <input class="field-input" name="lastname" value="{{ record.lastname or '' }}" placeholder="Last name">
+            </div>
+            <div class="field">
+              <label class="field-label">Email Address</label>
+              <input class="field-input" name="email" type="email" value="{{ record.email or '' }}" placeholder="email@example.com">
+            </div>
+          </div>
+
+          <p class="section-label"><i class="fas fa-stethoscope"></i> Contact & Medical</p>
+          <div class="form-grid cols-4">
+            <div class="field">
+              <label class="field-label">Phone Number</label>
+              <input class="field-input" name="phone_no" value="{{ record.phone_no or '' }}" placeholder="Phone">
+            </div>
+            <div class="field">
+              <label class="field-label">Area Code</label>
+              <input class="field-input" name="area_code" value="{{ record.area_code or '' }}" placeholder="e.g. 022">
+            </div>
+            <div class="field">
+              <label class="field-label">Disease</label>
+              <input class="field-input" name="disease" value="{{ record.disease or '' }}" placeholder="Disease name">
+            </div>
+            <div class="field">
+              <label class="field-label">Result</label>
+              <input class="field-input" name="result" value="{{ record.result or '' }}" placeholder="Prediction result">
+            </div>
+          </div>
+
+          <p class="section-label"><i class="fas fa-code"></i> Form Inputs</p>
+          <div class="field">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:6px;">
+              <label class="field-label" style="margin-bottom:0;">Inputs (JSON)</label>
+              <span class="json-status json-neutral" id="jsonStatus">JSON</span>
+            </div>
+            <textarea class="field-textarea" name="inputs" id="jsonInput" rows="10">{{ record.inputs or '{}' }}</textarea>
+            <span class="field-hint">Paste or edit valid JSON. All model input fields are stored here.</span>
+          </div>
+
+          <div class="form-footer">
+            <a class="btn-back" href="{{ url_for('records') }}"><i class="fas fa-arrow-left"></i> Back to Records</a>
+            <button class="btn-save" type="submit">
+              <i class="fas fa-save"></i> Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      const jsonInput = document.getElementById('jsonInput');
+      const jsonStatus = document.getElementById('jsonStatus');
+
+      function validateJSON() {
+        const val = jsonInput.value.trim();
+        if (!val) { jsonStatus.textContent = 'JSON'; jsonStatus.className = 'json-status json-neutral'; return; }
+        try {
+          JSON.parse(val);
+          jsonStatus.textContent = '✓ Valid JSON';
+          jsonStatus.className = 'json-status json-ok';
+        } catch(e) {
+          jsonStatus.textContent = '✗ Invalid JSON';
+          jsonStatus.className = 'json-status json-error';
+        }
+      }
+
+      const unsavedDot = document.getElementById('unsavedDot');
+      let isDirty = false;
+      document.querySelectorAll('#editForm input, #editForm textarea').forEach(el => {
+        el.addEventListener('input', () => {
+          if (!isDirty) { isDirty = true; unsavedDot.classList.add('visible'); }
+          if (el === jsonInput) validateJSON();
+        });
+      });
+      jsonInput.addEventListener('input', validateJSON);
+      window.addEventListener('load', validateJSON);
+
+      document.getElementById('editForm').addEventListener('submit', () => {
+        isDirty = false;
+        unsavedDot.classList.remove('visible');
+      });
+
+      window.addEventListener('beforeunload', e => {
+        if (isDirty) { e.preventDefault(); e.returnValue = ''; }
+      });
+
+      document.querySelectorAll('.field-input, .field-textarea').forEach(el => {
+        const label = el.closest('.field') && el.closest('.field').querySelector('.field-label');
+        el.addEventListener('focus', () => { if (label) label.style.color = 'var(--primary)'; });
+        el.addEventListener('blur', () => { if (label) label.style.color = 'var(--text-muted)'; });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HealthCure – Heart Disease Detection</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2E86DE;
+      --primary-dark: #1a6bbf;
+      --primary-light: #e8f2fd;
+      --secondary: #48C9B0;
+      --accent: #ef4444;
+      --accent-light: #fee2e2;
+      --bg: #F4F6F7;
+      --surface: #ffffff;
+      --surface2: #f8fafc;
+      --border: #e2e8f0;
+      --text: #1a2332;
+      --text-muted: #64748b;
+      --text-dim: #94a3b8;
+      --low: #22c55e;
+      --medium: #f59e0b;
+      --high: #ef4444;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.07);
+      --shadow: 0 4px 16px rgba(0,0,0,0.08);
+      --radius: 16px;
+      --radius-sm: 10px;
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); overflow: hidden; }
+
+    .navbar { background: var(--surface) !important; border-bottom: 1px solid var(--border); padding: 0 20px; height: 64px; display: flex; align-items: center; box-shadow: var(--shadow-sm); position: sticky; top: 0; z-index: 1000; }
+    .navbar-brand { color: var(--primary) !important; font-weight: 700; font-size: 1.2rem; display: flex; align-items: center; gap: 9px; }
+    .navbar-brand .brand-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.85rem; }
+    .nav-link { color: var(--text-muted) !important; font-size: 0.8rem; font-weight: 500; padding: 7px 12px !important; border-radius: 8px; transition: all 0.2s; }
+    .nav-link:hover { color: var(--primary) !important; background: var(--primary-light); }
+    .ai-btn { display: inline-flex !important; align-items: center; gap: 7px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)) !important; color: #fff !important; padding: 8px 18px !important; border-radius: 20px !important; font-weight: 600 !important; font-size: 0.8rem !important; border: none !important; box-shadow: 0 3px 12px rgba(46,134,222,0.3); transition: all 0.2s; cursor: pointer; }
+    .ai-btn:hover { transform: translateY(-1px) !important; }
+    .ai-btn.open { background: linear-gradient(135deg, #64748b, #475569) !important; box-shadow: none; }
+
+    .page-split { display: flex; height: calc(100vh - 64px); overflow: hidden; position: relative; }
+    .form-side { flex: 0 0 100%; overflow-y: auto; padding: 24px; transition: flex 0.36s cubic-bezier(0.4,0,0.2,1); }
+    .page-split.open .form-side { flex: 0 0 66.666%; }
+    .chat-side { flex: 0 0 0; overflow: hidden; transition: flex 0.36s cubic-bezier(0.4,0,0.2,1); background: var(--surface); border-left: 1px solid var(--border); display: flex; flex-direction: column; box-shadow: -4px 0 20px rgba(0,0,0,0.05); }
+    .page-split.open .chat-side { flex: 0 0 33.333%; overflow: visible; }
+
+    .form-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px 32px; box-shadow: var(--shadow); margin-bottom: 20px; animation: fadeUp 0.4s ease; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+    .form-card-header { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+    .form-card-icon { width: 48px; height: 48px; border-radius: 14px; background: var(--accent-light); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--accent); }
+    .form-card-title { font-size: 1.2rem; font-weight: 700; color: var(--text); }
+    .form-card-sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+
+    .section-label { font-size: 0.67rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin: 20px 0 12px; display: flex; align-items: center; gap: 8px; }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .section-label i { color: var(--accent); }
+
+    label { color: var(--text-muted); font-size: 0.74rem; font-weight: 500; display: block; margin-bottom: 5px; }
+    .form-control, select.form-control { background: var(--surface2); border: 1.5px solid var(--border); border-radius: 9px; color: var(--text); font-size: 0.92rem; padding: 11px 15px; transition: all 0.2s; width: 100%; font-family: 'Poppins', sans-serif; min-height: 48px; line-height: 1.5; }
+    .form-control:focus, select.form-control:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(239,68,68,0.1); outline: none; background: var(--surface); }
+    .form-control::placeholder { color: var(--text-dim); }
+    .form-control.is-invalid { border-color: var(--high) !important; }
+    .form-control.is-valid { border-color: var(--low) !important; }
+    .invalid-feedback { font-size: 0.68rem; color: var(--high); margin-top: 3px; }
+    .required-star { color: var(--high); margin-left: 2px; }
+    select, select.form-control { color: var(--text) !important; }
+    select option { background: #ffffff; color: #1a2332; }
+
+    /* ── SYMPTOM CHECKLIST ── */
+    .symptom-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px 26px;
+      margin-bottom: 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .symptom-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--accent), #dc2626);
+    }
+    .symptom-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+    .symptom-card-icon { width: 40px; height: 40px; border-radius: 11px; background: var(--accent-light); display: flex; align-items: center; justify-content: center; font-size: 1rem; color: var(--accent); flex-shrink: 0; }
+    .symptom-card-title { font-size: 1rem; font-weight: 700; color: var(--text); }
+    .symptom-card-desc { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 18px; margin-left: 52px; }
+    .symptom-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    @media (max-width: 600px) { .symptom-grid { grid-template-columns: 1fr 1fr; } }
+
+    .symptom-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 11px 14px;
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .symptom-item:hover { border-color: var(--accent); background: #fff5f5; }
+    .symptom-item.checked { background: var(--accent-light); border-color: var(--accent); }
+    .symptom-check {
+      width: 18px; height: 18px;
+      border: 2px solid var(--border);
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.2s;
+      background: var(--surface);
+    }
+    .symptom-item.checked .symptom-check { background: var(--accent); border-color: var(--accent); }
+    .symptom-check i { color: #fff; font-size: 0.6rem; display: none; }
+    .symptom-item.checked .symptom-check i { display: block; }
+    .symptom-label { font-size: 0.78rem; font-weight: 500; color: var(--text-muted); }
+    .symptom-item.checked .symptom-label { color: var(--accent); font-weight: 600; }
+    .symptom-score-tag { display: inline-flex; align-items: center; gap: 5px; padding: 3px 11px; background: var(--accent-light); border: 1px solid rgba(239,68,68,0.2); border-radius: 20px; font-size: 0.68rem; font-weight: 600; color: var(--accent); margin-left: auto; }
+
+    /* ── PATIENT HISTORY ── */
+    .history-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px 26px;
+      margin-bottom: 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .history-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+    }
+    .history-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+    .history-card-icon { width: 40px; height: 40px; border-radius: 11px; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 1rem; color: var(--primary); flex-shrink: 0; }
+    .history-card-title { font-size: 1rem; font-weight: 700; color: var(--text); }
+
+    .history-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+    @media (max-width: 768px) { .history-grid { grid-template-columns: repeat(2,1fr); } }
+    .history-field { display: flex; flex-direction: column; gap: 7px; }
+    .history-field-label { font-size: 0.65rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+
+    .toggle-group { display: flex; gap: 6px; }
+    .toggle-btn {
+      padding: 8px 18px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border);
+      background: var(--surface2);
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+      transition: all 0.2s;
+    }
+    .toggle-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .toggle-btn.active-yes { background: #dcfce7; border-color: #22c55e; color: #15803d; }
+    .toggle-btn.active-no { background: var(--primary-light); border-color: var(--primary); color: var(--primary); }
+
+    .history-select {
+      padding: 11px 15px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface2);
+      color: var(--text) !important;
+      font-size: 0.9rem;
+      font-family: 'Poppins', sans-serif;
+      outline: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      width: 100%;
+      min-height: 48px;
+      line-height: 1.5;
+    }
+    .history-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(46,134,222,0.1); background: var(--surface); }
+    .history-select option { background: #ffffff; color: #1a2332; }
+
+    .stress-slider-wrap { display: flex; align-items: center; gap: 10px; }
+    .stress-slider { flex: 1; -webkit-appearance: none; height: 5px; border-radius: 3px; background: var(--border); outline: none; }
+    .stress-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--primary); cursor: pointer; box-shadow: 0 2px 6px rgba(46,134,222,0.35); }
+    .stress-val { font-size: 0.9rem; font-weight: 700; color: var(--primary); min-width: 16px; text-align: center; }
+
+    .history-text-input {
+      padding: 11px 15px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface2);
+      color: var(--text);
+      font-size: 0.9rem;
+      font-family: 'Poppins', sans-serif;
+      outline: none;
+      width: 100%;
+      transition: all 0.2s;
+      min-height: 48px;
+      line-height: 1.5;
+    }
+    .history-text-input:focus { border-color: var(--primary); background: var(--surface); box-shadow: 0 0 0 3px rgba(46,134,222,0.1); }
+    .history-text-input::placeholder { color: var(--text-dim); }
+
+    .btn-submit { background: linear-gradient(135deg, var(--accent), #dc2626); border: none; padding: 13px 40px; font-weight: 600; border-radius: 50px; font-size: 0.9rem; color: #fff; transition: all 0.3s; box-shadow: 0 4px 16px rgba(239,68,68,0.35); font-family: 'Poppins', sans-serif; cursor: pointer; }
+    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 7px 24px rgba(239,68,68,0.45); }
+
+    .flash-msg { background: #fff5f5; border: 1px solid #fed7d7; color: var(--high); border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 14px; font-size: 0.82rem; }
+
+    /* RESULT PANEL */
+    .result-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; animation: fadeUp 0.4s ease; margin-bottom: 20px; box-shadow: var(--shadow); }
+    .result-header { padding: 18px 24px; background: linear-gradient(135deg, var(--accent), #dc2626); display: flex; align-items: center; justify-content: space-between; }
+    .result-header h3 { font-size: 1rem; font-weight: 700; color: #fff; }
+    .result-body { padding: 24px; }
+    .gauge-wrap { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; }
+    .gauge-ring { width: 140px; height: 80px; position: relative; overflow: hidden; }
+    .gauge-ring svg { width: 140px; height: 140px; position: absolute; top: 0; left: 0; }
+    .gauge-label { text-align: center; margin-top: 4px; }
+    .gauge-pct { font-size: 1.8rem; font-weight: 700; line-height: 1; }
+    .gauge-sub { font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
+    .risk-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+    .risk-Low    { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+    .risk-Medium { background: #fef9c3; color: #a16207; border: 1px solid #fef08a; }
+    .risk-High   { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
+    .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; }
+    .result-stat { background: var(--surface2); border-radius: 10px; padding: 14px 16px; border: 1px solid var(--border); }
+    .result-stat .rs-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 5px; }
+    .result-stat .rs-value { font-size: 1.05rem; font-weight: 700; }
+    .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 18px; }
+    .tab-btn { background: none; border: none; padding: 8px 16px; font-size: 0.76rem; font-weight: 600; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; font-family: 'Poppins', sans-serif; transition: all 0.2s; }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+    .rec-item { display: flex; gap: 10px; align-items: flex-start; padding: 10px 14px; background: var(--surface2); border-radius: 9px; margin-bottom: 8px; font-size: 0.8rem; border: 1px solid var(--border); color: var(--text-muted); }
+    .xai-bar-wrap { margin-bottom: 10px; }
+    .xai-label { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px; display: flex; justify-content: space-between; }
+    .xai-track { height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
+    .xai-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #dc2626); border-radius: 4px; }
+    .metrics-table { width: 100%; font-size: 0.74rem; border-collapse: separate; border-spacing: 0; }
+    .metrics-table th { color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; padding: 8px 12px; border-bottom: 1px solid var(--border); text-align: center; }
+    .metrics-table td { padding: 9px 12px; text-align: center; border-bottom: 1px solid var(--border); }
+    .metrics-table tr:hover td { background: var(--surface2); }
+    .metric-bar { display: inline-block; width: 40px; height: 4px; background: var(--border); border-radius: 2px; vertical-align: middle; margin-left: 4px; overflow: hidden; }
+    .metric-bar-fill { height: 100%; background: var(--primary); border-radius: 2px; }
+
+    /* CHAT */
+    .cs-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--border); flex-shrink: 0; background: linear-gradient(135deg, var(--accent), #dc2626); color: #fff; }
+    .cs-av-wrap { display: flex; align-items: center; gap: 10px; }
+    .cs-av-ico { width: 34px; height: 34px; border-radius: 10px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
+    .cs-title { font-weight: 700; font-size: 0.85rem; }
+    .cs-sub { font-size: 0.62rem; opacity: 0.85; }
+    .cs-dot { width: 6px; height: 6px; border-radius: 50%; background: #86efac; box-shadow: 0 0 5px #86efac; animation: csDot 2s ease-in-out infinite; display: inline-block; margin-right: 4px; }
+    @keyframes csDot { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .cs-close-btn { background: rgba(255,255,255,0.2); border: none; color: #fff; width: 28px; height: 28px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; transition: background 0.2s; }
+    .cs-close-btn:hover { background: rgba(255,255,255,0.35); }
+    .cs-chips { display: flex; gap: 5px; padding: 8px 12px; border-bottom: 1px solid var(--border); flex-wrap: wrap; flex-shrink: 0; background: var(--surface2); }
+    .cs-chip { font-size: 0.63rem; font-weight: 600; padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); color: var(--text-muted); cursor: pointer; background: var(--surface); transition: all 0.18s; font-family: 'Poppins', sans-serif; }
+    .cs-chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+    .cs-msgs { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 9px; min-height: 0; }
+    .cs-msgs::-webkit-scrollbar { width: 4px; }
+    .cs-msgs::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    .cs-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px 12px; gap: 10px; }
+    .cs-empty-icon { width: 50px; height: 50px; border-radius: 14px; background: var(--accent-light); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: var(--accent); }
+    .cs-empty-title { font-weight: 700; font-size: 0.85rem; color: var(--text); }
+    .cs-empty-sub { font-size: 0.72rem; color: var(--text-muted); line-height: 1.5; }
+    .cs-qps { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-top: 3px; }
+    .cs-qp { background: var(--surface2); border: 1px solid var(--border); border-radius: 14px; font-size: 0.65rem; padding: 5px 11px; cursor: pointer; color: var(--text-muted); font-family: 'Poppins', sans-serif; transition: all 0.18s; }
+    .cs-qp:hover { border-color: var(--accent); color: var(--accent); }
+    .cs-row { display: flex; gap: 7px; align-items: flex-end; animation: csIn 0.28s cubic-bezier(0.34,1.4,0.64,1) forwards; opacity: 0; transform: translateY(8px); }
+    @keyframes csIn { to{opacity:1;transform:translateY(0)} }
+    .cs-row.user { flex-direction: row-reverse; }
+    .cs-av { width: 25px; height: 25px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; flex-shrink: 0; }
+    .cs-av.bot { background: linear-gradient(135deg, var(--accent), #dc2626); color: #fff; }
+    .cs-av.user { background: var(--surface2); border: 1px solid var(--border); color: var(--text-muted); }
+    .cs-bbl { max-width: 83%; padding: 9px 13px; border-radius: 13px; font-size: 0.75rem; line-height: 1.55; word-break: break-word; font-family: 'Poppins', sans-serif; }
+    .cs-row.bot .cs-bbl { background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-bottom-left-radius: 3px; }
+    .cs-row.user .cs-bbl { background: linear-gradient(135deg, var(--accent), #dc2626); color: #fff; border-bottom-right-radius: 3px; box-shadow: 0 3px 10px rgba(239,68,68,0.3); }
+    .cs-typing { background: var(--surface2); border: 1px solid var(--border); border-radius: 13px; border-bottom-left-radius: 3px; padding: 10px 13px; display: flex; gap: 4px; align-items: center; }
+    .cs-typing span { width: 5px; height: 5px; border-radius: 50%; background: var(--text-dim); display: block; animation: csBounce 1.2s ease-in-out infinite; }
+    .cs-typing span:nth-child(2){animation-delay:.2s} .cs-typing span:nth-child(3){animation-delay:.4s}
+    @keyframes csBounce { 0%,80%,100%{transform:scale(1);opacity:0.4} 40%{transform:scale(1.3);opacity:1} }
+    .cs-input-area { padding: 10px 12px; border-top: 1px solid var(--border); display: flex; align-items: flex-end; gap: 8px; flex-shrink: 0; background: var(--surface); }
+    .cs-input-wrap { flex: 1; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 11px; display: flex; align-items: center; padding: 0 10px; gap: 6px; transition: border-color 0.2s, box-shadow 0.2s; }
+    .cs-input-wrap:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(239,68,68,0.1); }
+    #csInput { flex: 1; background: transparent; border: none; outline: none; font-family: 'Poppins', sans-serif; font-size: 0.75rem; color: var(--text); padding: 9px 0; resize: none; line-height: 1.4; max-height: 90px; }
+    #csInput::placeholder { color: var(--text-dim); }
+    .cs-send { width: 34px; height: 34px; border-radius: 9px; background: linear-gradient(135deg, var(--accent), #dc2626); border: none; color: #fff; font-size: 0.78rem; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; box-shadow: 0 3px 10px rgba(239,68,68,0.3); }
+    .cs-send:hover:not(:disabled) { transform: scale(1.08); }
+    .cs-send:disabled { opacity: 0.4; cursor: not-allowed; }
+    .cs-note { font-size: 0.58rem; color: var(--text-dim); text-align: center; padding: 4px 8px 8px; flex-shrink: 0; }
+    .form-side::-webkit-scrollbar { width: 5px; }
+    .form-side::-webkit-scrollbar-thumb { background: var(--border); border-radius: 5px; }
+    @media (max-width: 768px) {
+      .page-split.open .form-side { flex: 0 0 100%; }
+      .page-split.open .chat-side { position: fixed; right: 0; top: 64px; bottom: 0; width: 320px; z-index: 999; flex: unset; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg">
+  <div class="container-fluid px-3">
+    <a class="navbar-brand" href="/">
+      <div class="brand-icon"><i class="fas fa-heartbeat"></i></div>
+      HealthCure
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ml-auto align-items-center">
+        <li class="nav-item"><a class="nav-link active" href="/heart"><i class="fas fa-heart mr-1" style="color:#ef4444;"></i> Heart</a></li>
+        <li class="nav-item"><a class="nav-link" href="/diabetes"><i class="fas fa-syringe mr-1" style="color:#f59e0b;"></i> Diabetes</a></li>
+        <li class="nav-item"><a class="nav-link" href="/parkinson"><i class="fas fa-brain mr-1" style="color:#8b5cf6;"></i> Parkinson</a></li>
+        <li class="nav-item"><a class="nav-link" href="/chat"><i class="fas fa-comments mr-1" style="color:#059669;"></i> Chat</a></li>
+        <li class="nav-item"><a class="nav-link" href="/records"><i class="fas fa-folder-open mr-1" style="color:var(--primary);"></i> Records</a></li>
+        <li class="nav-item ml-2">
+          <button class="ai-btn" id="aiBtn" onclick="toggleChat()">
+            <i class="fas fa-robot"></i> AI Assistant
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="page-split" id="pageSplit">
+  <div class="form-side">
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}{% for m in messages %}
+        <div class="flash-msg"><i class="fas fa-exclamation-circle mr-2"></i>{{ m }}</div>
+      {% endfor %}{% endif %}
+    {% endwith %}
+
+    <div class="form-card">
+      <div class="form-card-header">
+        <div class="form-card-icon"><i class="fas fa-heartbeat"></i></div>
+        <div>
+          <div class="form-card-title">Heart Disease Detection</div>
+          <div class="form-card-sub">Enter clinical parameters for cardiovascular risk assessment</div>
+        </div>
+      </div>
+
+      <form method="POST" action="/heart" novalidate id="heartForm">
+
+        <!-- Hidden inputs populated by JS -->
+        <input type="hidden" name="symptom_score" id="symptomScoreInput" value="0">
+        <input type="hidden" name="smoking" id="smokingInput" value="0">
+        <input type="hidden" name="alcohol" id="alcoholInput" value="0">
+        <input type="hidden" name="family_history_heart" id="familyHistoryInput" value="0">
+        <input type="hidden" name="physical_activity" id="physicalActivityInput" value="Moderate">
+        <input type="hidden" name="stress_level" id="stressLevelInput" value="3">
+        <input type="hidden" name="diet_quality" id="dietQualityInput" value="Average">
+        <input type="hidden" name="previous_conditions" id="prevConditionsInput" value="">
+
+        <div class="section-label"><i class="fas fa-user"></i> Personal Information</div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label>First Name <span class="required-star">*</span></label>
+            <input type="text" class="form-control" name="firstname" placeholder="John" pattern="^[A-Za-z\s\-']{2,50}$" required>
+            <div class="invalid-feedback">Letters only, min 2 characters.</div>
+          </div>
+          <div class="form-group col-md-6">
+            <label>Last Name <span class="required-star">*</span></label>
+            <input type="text" class="form-control" name="lastname" placeholder="Doe" pattern="^[A-Za-z\s\-']{2,50}$" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label>Phone Number <span class="required-star">*</span></label>
+            <input type="tel" class="form-control" name="phone_no" placeholder="10-digit number" pattern="^[6-9][0-9]{9}$" maxlength="10" required>
+            <div class="invalid-feedback">Valid 10-digit number starting 6–9.</div>
+          </div>
+          <div class="form-group col-md-6">
+            <label>Email <span class="required-star">*</span></label>
+            <input type="email" class="form-control" name="email" placeholder="name@gmail.com" pattern="^[a-zA-Z0-9._%+\-]+@gmail\.com$" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label>Age <span class="required-star">*</span></label>
+            <input type="number" class="form-control" name="age" placeholder="e.g. 45" min="1" max="120" required>
+          </div>
+          <div class="form-group col-md-6">
+            <label>Gender <span class="required-star">*</span></label>
+            <select class="form-control" name="gender" required>
+              <option value="Male">Male</option><option value="Female">Female</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="section-label"><i class="fas fa-heartbeat"></i> Clinical Parameters</div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label>Chest Pain Type <span class="required-star">*</span></label>
+            <select class="form-control" name="cp" required>
+              <option value="0">Typical Angina</option>
+              <option value="1">Atypical Angina</option>
+              <option value="2">Non-Anginal Pain</option>
+              <option value="3">Asymptomatic</option>
+            </select>
+          </div>
+          <div class="form-group col-md-6">
+            <label>Fasting Blood Sugar <span class="required-star">*</span></label>
+            <select class="form-control" name="fps" required>
+              <option value="0">False (&lt;120 mg/dl)</option>
+              <option value="1">True (&gt;120 mg/dl)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label>Resting Blood Pressure (mm Hg) <span class="required-star">*</span></label>
+            <input type="number" class="form-control" name="trestbps" placeholder="e.g. 120" min="0" max="300" required>
+          </div>
+          <div class="form-group col-md-6">
+            <label>Serum Cholesterol (mg/dl) <span class="required-star">*</span></label>
+            <input type="number" class="form-control" name="chol" placeholder="e.g. 200" min="0" max="600" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label>Resting ECG Results <span class="required-star">*</span></label>
+            <select class="form-control" name="restecg" required>
+              <option value="0">Normal</option>
+              <option value="1">ST-T Wave Abnormality</option>
+              <option value="2">Left Ventricular Hypertrophy</option>
+            </select>
+          </div>
+          <div class="form-group col-md-6">
+            <label>Max Heart Rate Achieved <span class="required-star">*</span></label>
+            <input type="number" class="form-control" name="thalach" placeholder="e.g. 150" min="0" max="250" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label>Exercise Induced Angina <span class="required-star">*</span></label>
+            <select class="form-control" name="exang" required>
+              <option value="0">No</option><option value="1">Yes</option>
+            </select>
+          </div>
+          <div class="form-group col-md-6">
+            <label>ST Depression (Oldpeak) <span class="required-star">*</span></label>
+            <input type="number" step="0.1" class="form-control" name="oldpeak" placeholder="e.g. 1.0" min="0.0" max="10.0" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-4">
+            <label>ST Slope <span class="required-star">*</span></label>
+            <select class="form-control" name="slope" required>
+              <option value="0">Upsloping</option>
+              <option value="1">Flat</option>
+              <option value="2">Downsloping</option>
+            </select>
+          </div>
+          <div class="form-group col-md-4">
+            <label>Thalassemia Type <span class="required-star">*</span></label>
+            <select class="form-control" name="thal" required>
+              <option value="0">Normal</option>
+              <option value="1">Fixed Defect</option>
+              <option value="2">Reversible Defect</option>
+              <option value="3">Not Specified</option>
+            </select>
+          </div>
+          <div class="form-group col-md-4">
+            <label>Major Vessels (0–4) <span class="required-star">*</span></label>
+            <input type="number" class="form-control" name="ca" placeholder="0–4" min="0" max="4" required>
+          </div>
+        </div>
+
+        <!-- ── SYMPTOM CHECKLIST ── -->
+        <div class="section-label"><i class="fas fa-clipboard-check"></i> Symptom Checklist</div>
+        <div class="symptom-card mb-3">
+          <div class="symptom-card-header">
+            <div class="symptom-card-icon"><i class="fas fa-clipboard-check"></i></div>
+            <div style="flex:1;">
+              <div class="symptom-card-title">Symptom Checklist</div>
+            </div>
+            <div class="symptom-score-tag"><i class="fas fa-tally"></i> Score: <span id="heartSymptomScore">0</span>/6</div>
+          </div>
+          <div class="symptom-card-desc">Select symptoms you are currently experiencing. Each selection improves confidence accuracy using dataset feature weights.</div>
+          <div class="symptom-grid" id="heartSymptomGrid">
+            {% for sym in symptoms %}
+            {% set key = 'sym_' + sym.replace(' ','_').replace('(','').replace(')','').replace('/','_') %}
+            <input type="hidden" name="{{ key }}" id="inp_{{ key }}" value="0">
+            <div class="symptom-item" onclick="toggleSymptom(this,'heart','{{ key }}')">
+              <div class="symptom-check"><i class="fas fa-check"></i></div>
+              <span class="symptom-label">{{ sym }}</span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- ── PATIENT HISTORY ── -->
+        <div class="section-label"><i class="fas fa-dna"></i> Patient History &amp; Lifestyle</div>
+        <div class="history-card mb-3">
+          <div class="history-card-header">
+            <div class="history-card-icon"><i class="fas fa-dna"></i></div>
+            <div class="history-card-title">Patient History &amp; Lifestyle</div>
+          </div>
+          <div class="history-grid">
+            <div class="history-field">
+              <div class="history-field-label">Smoking</div>
+              <div class="toggle-group">
+                <button type="button" class="toggle-btn active-no" onclick="setToggle('smoking','No',this)">No</button>
+                <button type="button" class="toggle-btn" onclick="setToggle('smoking','Yes',this)">Yes</button>
+              </div>
+            </div>
+            <div class="history-field">
+              <div class="history-field-label">Alcohol Use</div>
+              <div class="toggle-group">
+                <button type="button" class="toggle-btn active-no" onclick="setToggle('alcohol','No',this)">No</button>
+                <button type="button" class="toggle-btn" onclick="setToggle('alcohol','Yes',this)">Yes</button>
+              </div>
+            </div>
+            <div class="history-field">
+              <div class="history-field-label">Family History of Heart Disease</div>
+              <div class="toggle-group">
+                <button type="button" class="toggle-btn active-no" onclick="setToggle('family_history_heart','No',this)">No</button>
+                <button type="button" class="toggle-btn" onclick="setToggle('family_history_heart','Yes',this)">Yes</button>
+              </div>
+            </div>
+            <div class="history-field">
+              <div class="history-field-label">Physical Activity</div>
+              <select class="history-select" onchange="document.getElementById('physicalActivityInput').value=this.value">
+                <option>Low</option><option selected>Moderate</option><option>High</option>
+              </select>
+            </div>
+            <div class="history-field" style="grid-column: span 2;">
+              <div class="history-field-label">Stress Level (1–5)</div>
+              <div class="stress-slider-wrap">
+                <input type="range" class="stress-slider" min="1" max="5" value="3"
+                  oninput="document.getElementById('stressVal').textContent=this.value; document.getElementById('stressLevelInput').value=this.value;">
+                <span class="stress-val" id="stressVal">3</span>
+              </div>
+              <div style="font-size:0.64rem;color:var(--text-dim);margin-top:3px;">1 = Very Low · 5 = Very High</div>
+            </div>
+            <div class="history-field">
+              <div class="history-field-label">Diet Quality</div>
+              <select class="history-select" onchange="document.getElementById('dietQualityInput').value=this.value">
+                <option>Poor</option><option selected>Average</option><option>Good</option><option>Excellent</option>
+              </select>
+            </div>
+            <div class="history-field">
+              <div class="history-field-label">Previous Conditions</div>
+              <input type="text" class="history-text-input" placeholder="e.g. Hypertension, High Cholesterol"
+                oninput="document.getElementById('prevConditionsInput').value=this.value">
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center mt-3">
+          <button type="submit" class="btn-submit">
+            <i class="fas fa-microscope mr-2"></i> Analyze &amp; Predict
+          </button>
+        </div>
+      </form>
+    </div>
+
+    {% if result %}
+    {% from "_result_panel.html" import render_result %}
+    {{ render_result(result, '#ef4444', '#dc2626', '239,68,68') }}
+    {% endif %}
+
+  </div><!-- /form-side -->
+
+  <!-- CHAT SIDE -->
+  <div class="chat-side" id="chatSide">
+    <div class="cs-header">
+      <div class="cs-av-wrap">
+        <div class="cs-av-ico"><i class="fas fa-robot"></i></div>
+        <div>
+          <div class="cs-title">HealthCure AI</div>
+          <div class="cs-sub"><span class="cs-dot"></span>Online — Heart Mode</div>
+        </div>
+      </div>
+      <button class="cs-close-btn" onclick="toggleChat()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="cs-chips">
+      <button class="cs-chip" onclick="csChip(this)">Heart Disease</button>
+      <button class="cs-chip" onclick="csChip(this)">Cholesterol</button>
+      <button class="cs-chip" onclick="csChip(this)">Blood Pressure</button>
+      <button class="cs-chip" onclick="csChip(this)">Angina</button>
+      <button class="cs-chip" onclick="csChip(this)">ECG</button>
+    </div>
+    <div class="cs-msgs" id="csMsgs">
+      <div class="cs-empty" id="csEmpty">
+        <div class="cs-empty-icon"><i class="fas fa-heart"></i></div>
+        <div class="cs-empty-title">Ask me anything!</div>
+        <div class="cs-empty-sub">I can explain heart disease parameters and help interpret your results.</div>
+        <div class="cs-qps">
+          <button class="cs-qp" onclick="csPrompt(this)">What is angina?</button>
+          <button class="cs-qp" onclick="csPrompt(this)">Normal cholesterol?</button>
+          <button class="cs-qp" onclick="csPrompt(this)">What does oldpeak mean?</button>
+          <button class="cs-qp" onclick="csPrompt(this)">Heart disease risk factors</button>
+        </div>
+      </div>
+    </div>
+    <div class="cs-input-area">
+      <div class="cs-input-wrap">
+        <textarea id="csInput" placeholder="Ask a health question…" rows="1" maxlength="400"></textarea>
+      </div>
+      <button class="cs-send" id="csSend"><i class="fas fa-paper-plane"></i></button>
+    </div>
+    <div class="cs-note"><i class="fas fa-shield-alt mr-1"></i>Educational only — not a substitute for medical advice.</div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+// ── TAB ──
+function showTab(paneId, btn) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(paneId).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── CHAT ──
+function toggleChat() {
+  const split = document.getElementById('pageSplit');
+  const btn = document.getElementById('aiBtn');
+  const open = split.classList.toggle('open');
+  btn.innerHTML = open ? '<i class="fas fa-times"></i> Close AI' : '<i class="fas fa-robot"></i> AI Assistant';
+  btn.classList.toggle('open', open);
+}
+function csPrompt(el) { const i = document.getElementById('csInput'); i.value = el.textContent; csResize(); i.focus(); }
+function csChip(el) { const i = document.getElementById('csInput'); i.value = 'Tell me about ' + el.textContent; csResize(); i.focus(); }
+function csResize() { const t = document.getElementById('csInput'); t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight, 90) + 'px'; }
+document.getElementById('csInput').addEventListener('input', csResize);
+document.getElementById('csInput').addEventListener('keydown', function(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); csSend(); } });
+document.getElementById('csSend').addEventListener('click', csSend);
+function csAddMsg(text, isUser) {
+  const empty = document.getElementById('csEmpty'); if (empty) empty.remove();
+  const row = document.createElement('div'); row.className = 'cs-row ' + (isUser ? 'user' : 'bot');
+  const av = document.createElement('div'); av.className = 'cs-av ' + (isUser ? 'user' : 'bot'); av.innerHTML = isUser ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
+  const bbl = document.createElement('div'); bbl.className = 'cs-bbl'; bbl.textContent = text;
+  row.appendChild(av); row.appendChild(bbl);
+  const msgs = document.getElementById('csMsgs'); msgs.appendChild(row); msgs.scrollTop = msgs.scrollHeight;
+}
+function csShowTyping() {
+  const empty = document.getElementById('csEmpty'); if (empty) empty.remove();
+  const row = document.createElement('div'); row.className = 'cs-row bot'; row.id = 'csTyping';
+  const av = document.createElement('div'); av.className = 'cs-av bot'; av.innerHTML = '<i class="fas fa-robot"></i>';
+  const tb = document.createElement('div'); tb.className = 'cs-typing'; tb.innerHTML = '<span></span><span></span><span></span>';
+  row.appendChild(av); row.appendChild(tb);
+  const msgs = document.getElementById('csMsgs'); msgs.appendChild(row); msgs.scrollTop = msgs.scrollHeight;
+}
+function csHideTyping() { const r = document.getElementById('csTyping'); if (r) r.remove(); }
+async function csSend() {
+  const inp = document.getElementById('csInput'); const q = inp.value.trim(); if (!q) return;
+  csAddMsg(q, true); inp.value = ''; inp.style.height = 'auto';
+  document.getElementById('csSend').disabled = true; csShowTyping();
+  try {
+    const res = await fetch('/chat/query', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ question: q }) });
+    const data = await res.json(); csHideTyping(); csAddMsg(data.answer, false);
+  } catch { csHideTyping(); csAddMsg('Could not reach the server. Please try again.', false); }
+  finally { document.getElementById('csSend').disabled = false; inp.focus(); }
+}
+
+// ── SYMPTOM CHECKLIST ──
+function toggleSymptom(el, disease, key) {
+  el.classList.toggle('checked');
+  // Update individual sym_ hidden input
+  if (key) {
+    const inp = document.getElementById('inp_' + key);
+    if (inp) inp.value = el.classList.contains('checked') ? '1' : '0';
+  }
+  updateSymptomScore(disease);
+}
+function updateSymptomScore(disease) {
+  const grid = document.getElementById(disease + 'SymptomGrid');
+  const checked = grid ? grid.querySelectorAll('.symptom-item.checked').length : 0;
+  const scoreEl = document.getElementById(disease + 'SymptomScore');
+  if (scoreEl) scoreEl.textContent = checked;
+  const scoreInp = document.getElementById('symptomScoreInput');
+  if (scoreInp) scoreInp.value = checked;
+}
+
+// ── PATIENT HISTORY TOGGLES ──
+const toggleState = { smoking: 'No', alcohol: 'No', family_history_heart: 'No' };
+function setToggle(field, value, btn) {
+  toggleState[field] = value;
+  const group = btn.closest('.toggle-group');
+  group.querySelectorAll('.toggle-btn').forEach(b => { b.classList.remove('active-yes','active-no'); });
+  btn.classList.add(value === 'Yes' ? 'active-yes' : 'active-no');
+  const hiddenVal = value === 'Yes' ? '1' : '0';
+  document.getElementById(field + 'Input') && (document.getElementById(field + 'Input').value = hiddenVal);
+  if (field === 'smoking') document.getElementById('smokingInput').value = hiddenVal;
+  if (field === 'alcohol') document.getElementById('alcoholInput').value = hiddenVal;
+  if (field === 'family_history_heart') document.getElementById('familyHistoryInput').value = hiddenVal;
+}
+
+// ── FORM VALIDATION ──
+document.querySelector('[name="phone_no"]').addEventListener('input', function() { this.value = this.value.replace(/\D/g, ''); });
+document.getElementById('heartForm').addEventListener('submit', function(e) {
+  let ok = true;
+  this.querySelectorAll('[required]').forEach(el => {
+    if (!el.checkValidity()) { ok = false; el.classList.add('is-invalid'); el.classList.remove('is-valid'); }
+    else { el.classList.remove('is-invalid'); el.classList.add('is-valid'); }
+  });
+  if (!ok) { e.preventDefault(); }
+});
+</script>
+</body>
+</html>

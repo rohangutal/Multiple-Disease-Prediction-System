@@ -1,0 +1,275 @@
+{# templates/_result_panel.html — Enhanced Result Panel Macro #}
+{% macro render_result(result, accent, accent_dark, accent_rgb) %}
+{% set rc = '#ef4444' if result.risk_level == 'High' else ('#f59e0b' if result.risk_level == 'Medium' else '#22c55e') %}
+
+<style>
+/* ── Enhanced Result Styles ───────────────────────────────────────────── */
+.eresult-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; animation: fadeUp 0.5s ease; margin-bottom: 20px; box-shadow: var(--shadow); }
+.eresult-header { padding: 16px 22px; background: linear-gradient(135deg, {{ accent }}, {{ accent_dark }}); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+.eresult-header h3 { font-size: 0.95rem; font-weight: 700; color: #fff; margin: 0; }
+.risk-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+.risk-Low    { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+.risk-Medium { background: #fef9c3; color: #a16207; border: 1px solid #fef08a; }
+.risk-High   { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
+
+.eresult-body { padding: 22px 24px; display: flex; flex-direction: column; gap: 20px; }
+
+/* Score row */
+.score-row { display: grid; grid-template-columns: auto 1fr; gap: 24px; align-items: center; }
+@media (max-width:600px) { .score-row { grid-template-columns: 1fr; } }
+
+/* Gauge */
+.gauge-outer { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.gauge-ring  { width: 140px; height: 80px; position: relative; overflow: hidden; }
+.gauge-ring svg { width: 140px; height: 140px; position: absolute; top: 0; left: 0; }
+.gauge-pct  { font-size: 2rem; font-weight: 800; text-align: center; }
+.gauge-sub  { font-size: 0.65rem; color: var(--text-muted); text-align: center; }
+
+/* Confidence breakdown bar */
+.conf-breakdown { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px; }
+.conf-title { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 12px; }
+.conf-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 7px; font-size: 0.72rem; }
+.conf-bar-label { width: 110px; flex-shrink: 0; color: var(--text-muted); font-weight: 500; }
+.conf-bar-track { flex: 1; background: var(--border); border-radius: 4px; height: 7px; overflow: hidden; }
+.conf-bar-fill  { height: 100%; border-radius: 4px; transition: width 0.8s ease; }
+.conf-bar-val   { min-width: 36px; text-align: right; font-weight: 700; color: var(--text); font-size: 0.72rem; }
+
+/* Stats grid */
+.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+@media (max-width:600px) { .stats-grid { grid-template-columns: 1fr 1fr; } }
+.stat-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+.stat-label { font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 5px; }
+.stat-value { font-size: 1.0rem; font-weight: 700; color: var(--text); }
+
+/* Matched symptoms */
+.sym-section { }
+.sym-title { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.sym-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.sym-tags { display: flex; flex-wrap: wrap; gap: 7px; }
+.sym-tag { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; background: rgba({{ accent_rgb }}, 0.1); border: 1px solid rgba({{ accent_rgb }}, 0.3); color: {{ accent_dark }}; border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
+.sym-empty { font-size: 0.78rem; color: var(--text-dim); font-style: italic; }
+.mismatch-warn { background: #fef9c3; border: 1px solid #fef08a; border-radius: 8px; padding: 10px 14px; font-size: 0.75rem; color: #92400e; display: flex; gap: 8px; align-items: flex-start; }
+
+/* Tabs */
+.etabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 14px; flex-wrap: wrap; }
+.etab-btn { background: none; border: none; padding: 8px 16px; font-size: 0.74rem; font-weight: 600; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; font-family: 'Poppins', sans-serif; transition: all 0.2s; }
+.etab-btn.active { color: {{ accent }}; border-bottom-color: {{ accent }}; }
+.etab-pane { display: none; }
+.etab-pane.active { display: block; }
+
+/* Recommendations */
+.rec-item { display: flex; gap: 10px; align-items: flex-start; padding: 10px 14px; background: var(--surface2); border-radius: 9px; margin-bottom: 8px; font-size: 0.8rem; border: 1px solid var(--border); color: var(--text-muted); }
+
+/* Explanation */
+.exp-item { display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 0.75rem; color: var(--text-muted); line-height: 1.5; }
+.exp-item:last-child { border-bottom: none; }
+
+/* Download btn */
+.dl-btn { display: inline-flex; align-items: center; gap: 8px; padding: 9px 20px; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.77rem; font-weight: 600; color: var(--text-muted); cursor: pointer; font-family: 'Poppins', sans-serif; transition: all 0.2s; }
+.dl-btn:hover { border-color: {{ accent }}; color: {{ accent }}; background: rgba({{ accent_rgb }}, 0.05); }
+</style>
+
+<div class="eresult-panel" id="enhancedResult">
+  <div class="eresult-header">
+    <h3><i class="fas fa-clipboard-check mr-2"></i> Results — {{ result.firstname }} {{ result.lastname }}</h3>
+    <span class="risk-badge risk-{{ result.risk_level }}">
+      <i class="fas fa-{% if result.risk_level == 'High' %}exclamation-triangle{% elif result.risk_level == 'Medium' %}exclamation-circle{% else %}check-circle{% endif %}"></i>
+      {{ result.risk_level }} Risk
+    </span>
+  </div>
+
+  <div class="eresult-body">
+
+    <!-- Score Row -->
+    <div class="score-row">
+      <!-- Semicircle Gauge -->
+      <div class="gauge-outer">
+        <div class="gauge-ring">
+          <svg viewBox="0 0 140 140">
+            <circle cx="70" cy="70" r="54" fill="none" stroke="#f1f5f9" stroke-width="12"
+              stroke-dasharray="170 339.29" stroke-dashoffset="-84.6" stroke-linecap="round"/>
+            <circle cx="70" cy="70" r="54" fill="none"
+              stroke="{{ rc }}" stroke-width="12"
+              stroke-dasharray="{{ (result.probability / 100 * 169.6)|round(1) }} 339.29"
+              stroke-dashoffset="-84.6" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="gauge-pct" style="color:{{ rc }};">{{ result.probability }}%</div>
+        <div class="gauge-sub">Enhanced Confidence</div>
+      </div>
+
+      <!-- Confidence Breakdown Bars -->
+      <div class="conf-breakdown">
+        <div class="conf-title"><i class="fas fa-sliders-h mr-1"></i> Score Breakdown</div>
+        <div class="conf-bar-row">
+          <span class="conf-bar-label">🤖 Base ML Model</span>
+          <div class="conf-bar-track"><div class="conf-bar-fill" style="width:{{ result.base_probability }}%;background:#6366f1;"></div></div>
+          <span class="conf-bar-val">{{ result.base_probability }}%</span>
+        </div>
+        <div class="conf-bar-row">
+          <span class="conf-bar-label">🔍 Symptom Match</span>
+          <div class="conf-bar-track"><div class="conf-bar-fill" style="width:{% if result.symptom_adjustment * 8 > 100 %}100{% else %}{{ result.symptom_adjustment * 8 }}{% endif %}%;background:{{ accent }};"></div></div>
+          <span class="conf-bar-val">+{{ result.symptom_adjustment }}%</span>
+        </div>
+        <div class="conf-bar-row">
+          <span class="conf-bar-label">🏥 History Impact</span>
+          <div class="conf-bar-track"><div class="conf-bar-fill" style="width:{% if result.history_adjustment * 12 > 100 %}100{% else %}{{ result.history_adjustment * 12 }}{% endif %}%;background:#48C9B0;"></div></div>
+          <span class="conf-bar-val">+{{ result.history_adjustment }}%</span>
+        </div>
+        {% if result.rule_adjustment != 0 %}
+        <div class="conf-bar-row">
+          <span class="conf-bar-label">⚡ Rule Layer</span>
+          <div class="conf-bar-track"><div class="conf-bar-fill" style="width:{% set ra = result.rule_adjustment if result.rule_adjustment > 0 else -result.rule_adjustment %}{% if ra * 12 > 100 %}100{% else %}{{ ra * 12 }}{% endif %}%;background:{% if result.rule_adjustment > 0 %}#22c55e{% else %}#ef4444{% endif %};"></div></div>
+          <span class="conf-bar-val" style="color:{% if result.rule_adjustment > 0 %}#16a34a{% else %}#dc2626{% endif %};">{{ '+' if result.rule_adjustment > 0 else '' }}{{ result.rule_adjustment }}%</span>
+        </div>
+        {% endif %}
+        <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:0.68rem;color:var(--text-muted);font-weight:600;">FINAL SCORE</span>
+          <span style="font-size:1.1rem;font-weight:800;color:{{ rc }};">{{ result.probability }}%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Diagnosis</div>
+        <div class="stat-value" style="color:{% if result.is_positive %}#ef4444{% else %}#22c55e{% endif %};">{{ result.prediction }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Risk Level</div>
+        <div class="stat-value" style="color:{{ rc }};">{{ result.risk_level }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Model Certainty</div>
+        <div class="stat-value" style="font-size:0.85rem;">{{ result.confidence_tier }}</div>
+      </div>
+      <div class="stat-card" style="grid-column: span {% if result.matched_symptoms %}1{% else %}3{% endif %};">
+        <div class="stat-label">Symptom Match</div>
+        <div class="stat-value">{{ result.symptom_match_score }}%</div>
+      </div>
+      {% if result.matched_symptoms %}
+      <div class="stat-card" style="grid-column: span 2;">
+        <div class="stat-label">Classification</div>
+        <div class="stat-value" style="font-size:0.78rem;">{{ result.subtype }}</div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Matched Symptoms -->
+    <div class="sym-section">
+      <div class="sym-title"><i class="fas fa-check-double" style="color:{{ accent }};"></i> Matched Symptoms</div>
+      {% if result.matched_symptoms %}
+      <div class="sym-tags">
+        {% for sym in result.matched_symptoms %}
+        <span class="sym-tag"><i class="fas fa-check-circle"></i> {{ sym }}</span>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="sym-empty"><i class="fas fa-info-circle mr-1"></i>No symptoms were reported. Selecting relevant symptoms improves confidence accuracy.</div>
+      {% endif %}
+    </div>
+
+    {% if result.mismatch_flag %}
+    <div class="mismatch-warn">
+      <i class="fas fa-exclamation-triangle" style="flex-shrink:0;margin-top:2px;"></i>
+      <span>Reported symptoms do not strongly align with the predicted disease. Consider consulting a physician for a thorough evaluation.</span>
+    </div>
+    {% endif %}
+
+    <!-- Tabs -->
+    <div>
+      <div class="etabs">
+        <button class="etab-btn active" onclick="showETab('etab-rec',this)"><i class="fas fa-notes-medical mr-1"></i> Recommendations</button>
+        <button class="etab-btn" onclick="showETab('etab-exp',this)"><i class="fas fa-brain mr-1"></i> AI Explanation</button>
+        <button class="etab-btn" onclick="showETab('etab-sym',this)"><i class="fas fa-list mr-1"></i> Symptom Details</button>
+      </div>
+
+      <div id="etab-rec" class="etab-pane active">
+        {% for r in result.recommendations %}
+        <div class="rec-item">
+          <span style="color:{{ rc }};flex-shrink:0;margin-top:1px;">
+            <i class="fas fa-{% if result.risk_level == 'High' %}exclamation-triangle{% elif result.risk_level == 'Medium' %}info-circle{% else %}leaf{% endif %}"></i>
+          </span>
+          {{ r }}
+        </div>
+        {% endfor %}
+      </div>
+
+      <div id="etab-exp" class="etab-pane">
+        {% for line in result.explanation %}
+        <div class="exp-item">{{ line }}</div>
+        {% endfor %}
+        <div style="margin-top:10px;font-size:0.68rem;color:var(--text-dim);background:var(--surface2);border-radius:8px;padding:8px 12px;">
+          <i class="fas fa-shield-alt mr-1"></i>
+          Formula: Final Confidence = Base ML Probability + (Symptom Match × W1) + (History Impact × W2) ± Rule Adjustment
+        </div>
+      </div>
+
+      <div id="etab-sym" class="etab-pane">
+        {% if result.symptom_details %}
+          {% for d in result.symptom_details %}
+          <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);">
+            <div style="width:28px;height:28px;border-radius:8px;background:rgba({{ accent_rgb }},0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <i class="fas fa-check" style="font-size:0.7rem;color:{{ accent }};"></i>
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:0.8rem;font-weight:700;color:var(--text);">{{ d.name }}</div>
+              <div style="font-size:0.7rem;color:var(--text-muted);margin-top:2px;">{{ d.description }}</div>
+              <div style="font-size:0.65rem;color:var(--text-dim);margin-top:3px;">
+                Dataset feature: <strong>{{ d.dataset_col }}</strong> &nbsp;·&nbsp;
+                Weight: <strong>{{ (d.weight * 100)|round(0)|int }}%</strong> &nbsp;·&nbsp;
+                Severity: <strong>{% if d.severity == 3 %}High{% elif d.severity == 2 %}Moderate{% else %}Mild{% endif %}</strong>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="sym-empty" style="padding:16px 0;"><i class="fas fa-info-circle mr-1"></i>Select symptoms in the form above to see detailed symptom analysis.</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Download Report -->
+    <div style="display:flex;justify-content:flex-end;padding-top:4px;">
+      <button class="dl-btn" onclick="downloadReport()">
+        <i class="fas fa-download"></i> Download Report
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function showETab(paneId, btn) {
+  document.querySelectorAll('.etab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.etab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(paneId).classList.add('active');
+  btn.classList.add('active');
+}
+
+function downloadReport() {
+  const payload = {
+    firstname:        {{ result.firstname | tojson }},
+    lastname:         {{ result.lastname | tojson }},
+    disease:          {{ result.disease | tojson }},
+    prediction:       {{ result.prediction | tojson }},
+    probability:      {{ result.probability }},
+    risk_level:       {{ result.risk_level | tojson }},
+    matched_symptoms: {{ result.matched_symptoms | tojson }},
+    explanation:      {{ result.explanation | tojson }},
+    recommendations:  {{ result.recommendations | tojson }},
+  };
+  fetch('/report/download', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(payload)
+  }).then(r => r.blob()).then(blob => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `HealthCure_${payload.firstname}_${payload.lastname}.html`;
+    a.click();
+  });
+}
+</script>
+{% endmacro %}

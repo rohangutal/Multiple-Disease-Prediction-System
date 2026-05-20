@@ -1,0 +1,18 @@
+document.getElementById('predictionForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    
+    const symptomsInput = document.getElementById('symptoms').value;
+    const symptoms = symptomsInput.split(',').map(symptom => symptom.trim().toLowerCase());
+    
+    const predictions = predictDisease(symptoms);
+    
+    document.getElementById('result').innerHTML = predictions;
+});
+
+function predictDisease(symptoms) {
+    let diabetesRisk = symptoms.includes('fatigue') || symptoms.includes('thirst') ? 'High risk of Diabetes.' : 'Low risk of Diabetes.';
+    let heartRisk = symptoms.includes('chest pain') || symptoms.includes('shortness of breath') ? 'High risk of Heart Disease.' : 'Low risk of Heart Disease.';
+    let parkinsonRisk = symptoms.includes('tremors') || symptoms.includes('stiffness') ? 'High risk of Parkinson\'s Disease.' : 'Low risk of Parkinson\'s Disease.';
+
+    return <p>${diabetesRisk}</p><p>${heartRisk}</p><p>${parkinsonRisk}</p>;
+}

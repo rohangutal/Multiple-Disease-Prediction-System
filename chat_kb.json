@@ -1,0 +1,42 @@
+[
+  {
+    "question": "what are common heart disease symptoms",
+    "answer": "Common heart disease symptoms include chest pain, shortness of breath, fatigue, dizziness, and cold sweats. If you experience these, seek medical advice."
+  },
+  {
+    "question": "how can i prevent heart disease",
+    "answer": "Prevent heart disease with regular exercise, healthy diet, not smoking, maintaining healthy weight, and managing blood pressure, cholesterol, and diabetes."
+  },
+  {
+    "question": "what is a normal blood pressure",
+    "answer": "Normal blood pressure is around 120/80 mmHg. Values above 130/80 are considered elevated, and you should monitor them with a doctor."
+  },
+  {
+    "question": "diabetes risk factors",
+    "answer": "Diabetes risk factors include high BMI, family history, poor diet, physical inactivity, high blood pressure, and high cholesterol."
+  },
+  {
+    "question": "what is hba1c",
+    "answer": "HbA1c measures average blood glucose over 2-3 months; normal is below 5.7%. Higher values indicate prediabetes or diabetes risk."
+  },
+  {
+    "question": "what does bmi mean",
+    "answer": "BMI is body mass index, a ratio of weight to height. 18.5-24.9 is normal, 25-29.9 is overweight, and 30+ is obese."
+  },
+  {
+    "question": "parkinson disease signs",
+    "answer": "Parkinson signs include tremor, muscle stiffness, slow movement, and balance problems. Diagnosis and care should be done by a specialist."
+  },
+  {
+    "question": "what should i do if my sugar is high",
+    "answer": "If your blood sugar is high, stay hydrated, do light exercise, and follow your doctor’s guidance. Avoid sugary foods and monitor levels closely."
+  },
+  {
+    "question": "is this medical advice",
+    "answer": "This chatbot provides educational guidance only and is not a substitute for medical consultation. Always consult a healthcare professional for personal medical advice."
+  },
+  {
+    "question": "what is hypertension",
+    "answer": "Hypertension means high blood pressure."
+  }
+]

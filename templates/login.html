@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin Login — HealthCure</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+      :root {
+        --primary: #2E86DE;
+        --primary-dark: #1a6bbf;
+        --primary-light: #e8f2fd;
+        --secondary: #48C9B0;
+        --bg: #F4F6F7;
+        --surface: #ffffff;
+        --surface2: #f8fafc;
+        --border: #e2e8f0;
+        --text: #1a2332;
+        --text-muted: #64748b;
+        --text-dim: #94a3b8;
+        --danger: #dc2626;
+        --success: #15803d;
+        --shadow: 0 16px 48px rgba(46,134,222,0.12);
+        --radius: 18px;
+        --radius-sm: 10px;
+      }
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        font-family: 'Poppins', sans-serif;
+        background: var(--bg);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        background-image:
+          radial-gradient(ellipse 60% 50% at 15% 15%, rgba(46,134,222,0.08) 0%, transparent 60%),
+          radial-gradient(ellipse 50% 60% at 85% 85%, rgba(72,201,176,0.06) 0%, transparent 60%);
+      }
+
+      /* Decorative blobs */
+      .blob { position: fixed; border-radius: 50%; pointer-events: none; filter: blur(70px); }
+      .blob-1 { width: 500px; height: 500px; background: rgba(46,134,222,0.08); top: -150px; left: -150px; animation: drift 22s ease-in-out infinite; }
+      .blob-2 { width: 380px; height: 380px; background: rgba(72,201,176,0.07); bottom: -100px; right: -100px; animation: drift 28s ease-in-out infinite reverse; }
+      @keyframes drift { 0%,100%{transform:translate(0,0)} 50%{transform:translate(20px,15px)} }
+
+      /* Cross pattern */
+      .cross-pattern {
+        position: fixed; inset: 0; pointer-events: none; opacity: 0.035;
+        background-image:
+          linear-gradient(var(--primary) 1px, transparent 1px),
+          linear-gradient(90deg, var(--primary) 1px, transparent 1px);
+        background-size: 40px 40px;
+      }
+
+      .login-wrapper {
+        width: 100%;
+        max-width: 440px;
+        padding: 20px;
+        position: relative;
+        z-index: 1;
+        animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both;
+      }
+      @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+
+      /* Brand */
+      .brand { text-align: center; margin-bottom: 28px; }
+      .brand-icon-wrap {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 70px; height: 70px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        border-radius: 22px;
+        margin-bottom: 14px;
+        box-shadow: 0 10px 30px rgba(46,134,222,0.35);
+        animation: popIn 0.5s 0.15s cubic-bezier(0.34,1.56,0.64,1) both;
+        position: relative;
+        overflow: hidden;
+      }
+      .brand-icon-wrap::before {
+        content: '';
+        position: absolute; inset: 0;
+        background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 60%);
+      }
+      @keyframes popIn { from{opacity:0;transform:scale(0.5) rotate(-10deg)} to{opacity:1;transform:scale(1) rotate(0)} }
+      .brand-icon-wrap i { font-size: 1.8rem; color: #fff; position: relative; z-index: 1; }
+      .brand h1 { font-size: 1.5rem; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
+      .brand-sub { font-size: 0.78rem; color: var(--text-muted); margin-top: 5px; font-weight: 400; }
+      .brand-badge {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: var(--primary-light); border: 1px solid rgba(46,134,222,0.2);
+        border-radius: 20px; padding: 3px 12px; font-size: 0.68rem;
+        font-weight: 600; color: var(--primary); margin-top: 8px;
+        text-transform: uppercase; letter-spacing: 0.07em;
+      }
+
+      /* Card */
+      .card {
+        background: var(--surface);
+        border-radius: var(--radius);
+        padding: 36px 38px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+        position: relative;
+        overflow: hidden;
+      }
+      .card-top-bar {
+        position: absolute; top: 0; left: 0; right: 0; height: 3px;
+        background: linear-gradient(90deg, var(--primary), var(--primary-dark), var(--secondary));
+      }
+
+      /* Alerts */
+      .alert { padding: 11px 14px; border-radius: 9px; font-size: 0.8rem; margin-bottom: 20px; display: flex; align-items: flex-start; gap: 8px; }
+      .alert i { margin-top: 1px; flex-shrink: 0; }
+      .alert-danger  { background: #fff5f5; color: var(--danger); border: 1px solid #fecaca; border-left: 3px solid var(--danger); }
+      .alert-success { background: #f0fdf4; color: var(--success); border: 1px solid #bbf7d0; border-left: 3px solid var(--success); }
+
+      /* Form */
+      .form-group { margin-bottom: 20px; }
+      .field-label { display: block; font-size: 0.68rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 7px; }
+
+      .input-wrap { position: relative; }
+      .input-icon {
+        position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
+        color: var(--text-dim); font-size: 0.85rem;
+        pointer-events: none; transition: color 0.2s;
+      }
+      .input-wrap input:focus ~ .input-icon,
+      .input-wrap input:focus + .input-icon { color: var(--primary); }
+
+      input[type="text"], input[type="password"] {
+        width: 100%;
+        padding: 13px 42px 13px 38px;
+        background: var(--surface2);
+        border: 1.5px solid var(--border);
+        border-radius: var(--radius-sm);
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.88rem;
+        color: var(--text);
+        outline: none;
+        transition: border-color 0.22s, box-shadow 0.22s, background 0.22s;
+        -webkit-appearance: none;
+      }
+      input[type="text"]:focus, input[type="password"]:focus {
+        border-color: var(--primary);
+        background: var(--surface);
+        box-shadow: 0 0 0 3px rgba(46,134,222,0.1);
+      }
+      input::placeholder { color: var(--text-dim); }
+
+      .eye-btn {
+        position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+        background: none; border: none; cursor: pointer;
+        padding: 4px; color: var(--text-dim); transition: color 0.2s;
+        display: flex; align-items: center;
+      }
+      .eye-btn:hover { color: var(--primary); }
+
+      /* Submit */
+      .btn-submit {
+        width: 100%; padding: 14px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: #fff;
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.9rem; font-weight: 600;
+        border: none; border-radius: var(--radius-sm);
+        cursor: pointer; letter-spacing: 0.02em;
+        box-shadow: 0 4px 18px rgba(46,134,222,0.38);
+        transition: transform 0.15s, box-shadow 0.2s;
+        margin-top: 8px;
+        position: relative; overflow: hidden;
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+      }
+      .btn-submit::before {
+        content: '';
+        position: absolute; inset: 0;
+        background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 55%);
+        pointer-events: none;
+      }
+      .btn-submit:hover { transform: translateY(-1.5px); box-shadow: 0 7px 24px rgba(46,134,222,0.45); }
+      .btn-submit:active { transform: translateY(0); }
+
+      /* Divider */
+      .or-row { display: flex; align-items: center; gap: 12px; margin: 20px 0; color: var(--text-dim); font-size: 0.72rem; }
+      .or-row::before, .or-row::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+      /* Cancel */
+      .btn-cancel {
+        display: flex; align-items: center; justify-content: center; gap: 7px;
+        width: 100%; padding: 12px;
+        background: transparent;
+        color: var(--text-muted);
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.84rem; font-weight: 500;
+        border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+        text-align: center; text-decoration: none;
+        transition: all 0.2s;
+      }
+      .btn-cancel:hover { background: var(--primary-light); color: var(--primary); border-color: var(--primary); text-decoration: none; }
+
+      /* Footer */
+      .footer-note { text-align: center; margin-top: 20px; font-size: 0.7rem; color: var(--text-dim); display: flex; align-items: center; justify-content: center; gap: 5px; }
+    </style>
+  </head>
+  <body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="cross-pattern"></div>
+
+    <div class="login-wrapper">
+      <div class="brand">
+        <div class="brand-icon-wrap">
+          <i class="fas fa-heartbeat"></i>
+        </div>
+        <h1>Admin Portal</h1>
+        <div class="brand-sub">Secure access to your management dashboard</div>
+        <div class="brand-badge"><i class="fas fa-shield-alt"></i> HealthCure</div>
+      </div>
+
+      <div class="card">
+        <div class="card-top-bar"></div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, msg in messages %}
+              <div class="alert alert-{{ category }}">
+                <i class="fas fa-{% if category == 'danger' %}exclamation-circle{% else %}check-circle{% endif %}"></i>
+                {{ msg }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <form method="post" action="{{ url_for('login') }}">
+          <input type="hidden" name="next" value="{{ next }}">
+
+          <div class="form-group">
+            <label class="field-label" for="admin_id">Admin ID</label>
+            <div class="input-wrap">
+              <input type="text" id="admin_id" name="admin_id" placeholder="your-admin-id" required autocomplete="username">
+              <i class="fas fa-user input-icon"></i>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="field-label" for="admin_pwd">Password</label>
+            <div class="input-wrap">
+              <input type="password" id="admin_pwd" name="admin_pwd" placeholder="••••••••" required autocomplete="current-password">
+              <i class="fas fa-lock input-icon"></i>
+              <button type="button" class="eye-btn" onclick="togglePwd(this)" title="Toggle visibility">
+                <i class="fas fa-eye" id="eyeIcon" style="font-size:0.85rem;"></i>
+              </button>
+            </div>
+          </div>
+
+          <button class="btn-submit" type="submit">
+            <i class="fas fa-sign-in-alt"></i>
+            Sign In
+          </button>
+
+          <div class="or-row">or</div>
+
+          <a class="btn-cancel" href="/">
+            <i class="fas fa-arrow-left"></i>
+            Back to Home
+          </a>
+        </form>
+      </div>
+
+      <div class="footer-note">
+        <i class="fas fa-lock"></i>
+        Protected area · Unauthorized access is prohibited
+      </div>
+    </div>
+
+    <script>
+      function togglePwd(btn) {
+        const pwd = document.getElementById('admin_pwd');
+        const icon = document.getElementById('eyeIcon');
+        const isHidden = pwd.type === 'password';
+        pwd.type = isHidden ? 'text' : 'password';
+        icon.className = isHidden ? 'fas fa-eye-slash' : 'fas fa-eye';
+        icon.style.fontSize = '0.85rem';
+        btn.style.color = isHidden ? 'var(--primary)' : 'var(--text-dim)';
+      }
+
+      // Animate icon color on focus
+      document.querySelectorAll('.input-wrap input').forEach(inp => {
+        const icon = inp.parentElement.querySelector('.input-icon');
+        inp.addEventListener('focus', () => { if (icon) icon.style.color = 'var(--primary)'; });
+        inp.addEventListener('blur', () => { if (icon) icon.style.color = 'var(--text-dim)'; });
+      });
+    </script>
+  </body>
+</html>
